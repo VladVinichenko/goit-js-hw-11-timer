@@ -63,44 +63,34 @@ class CountdownTimer {
     }
 
     function timeactive(days, hours, mins, secs) {
-      //add and remove active class (.field_click) to changed field
+      //checker changes values
       if (days !== oldvalues.days) {
-        timerRefs.days.parentNode.classList.add('field_click');
-        const timerTick = setTimeout(timeOutTick, 150);
-        function timeOutTick() {
-          clearTimeout(timerTick);
-          timerRefs.days.parentNode.classList.remove('field_click');
-        }
+        adaptiveList(timerRefs.days);
       }
       if (hours !== oldvalues.hours) {
-        timerRefs.hours.parentNode.classList.add('field_click');
-        const timerTick = setTimeout(timeOutTick, 150);
-        function timeOutTick() {
-          clearTimeout(timerTick);
-          timerRefs.hours.parentNode.classList.remove('field_click');
-        }
+        adaptiveList(timerRefs.hours);
       }
       if (mins !== oldvalues.mins) {
-        timerRefs.mins.parentNode.classList.add('field_click');
-        const timerTick = setTimeout(timeOutTick, 150);
-        function timeOutTick() {
-          clearTimeout(timerTick);
-          timerRefs.mins.parentNode.classList.remove('field_click');
-        }
+        adaptiveList(timerRefs.mins);
       }
       if (secs !== oldvalues.secs) {
-        timerRefs.secs.parentNode.classList.add('field_click');
-        const timerTick = setTimeout(timeOutTick, 150);
-        function timeOutTick() {
-          clearTimeout(timerTick);
-          timerRefs.secs.parentNode.classList.remove('field_click');
-        }
+        adaptiveList(timerRefs.secs);
       }
 
       oldvalues.days = days;
       oldvalues.hours = hours;
       oldvalues.mins = mins;
       oldvalues.secs = secs;
+    }
+
+    function adaptiveList(rel) {
+      //add and remove active class (.field_click)
+      rel.parentNode.classList.add('field_click');
+      const timerTick = setTimeout(timeOutTick, 150);
+      function timeOutTick() {
+        clearTimeout(timerTick);
+        rel.parentNode.classList.remove('field_click');
+      }
     }
     start();
   }
@@ -126,8 +116,7 @@ function timer() {
   function start() {
     if (!started) {
       started = true;
-      refs.timerBox.classList.remove('is-hide');
-      refs.formBox.classList.add('is-hide');
+      isHiddenReplacer(refs.formBox, refs.timerBox);
       refs.start.setAttribute('disabled', true);
       //=========of class
       new CountdownTimer({
@@ -137,6 +126,12 @@ function timer() {
       //=========of class
     }
   }
+
+  function isHiddenReplacer(add, remove) {
+    remove.classList.remove('is-hide');
+    add.classList.add('is-hide');
+  }
+
   function initPage() {
     //start settings on download page
     refs.start.setAttribute('disabled', true);
