@@ -19,6 +19,7 @@ class CountdownTimer {
     let started = false; //started timer
     let timerId = null;
     let changeTime = null;
+    const oldvalues = {};
     function start() {
       if (!started) {
         timerId = setInterval(newValue, 1000);
@@ -27,6 +28,7 @@ class CountdownTimer {
       }
     }
 
+    const observer = new MutationObserver(e => console.log(e));
     function newValue() {
       if (Date.now() < time) {
         changeTime = time - Date.now();
@@ -49,6 +51,9 @@ class CountdownTimer {
       const mins = pad(Math.floor((currentTime % (1000 * 60 * 60)) / (1000 * 60)));
       const secs = pad(Math.floor((currentTime % (1000 * 60)) / 1000));
       getValue(days, hours, mins, secs);
+      timeactive(days, hours, mins, secs);
+
+      observer;
     }
     function getValue(days, hours, mins, secs) {
       timerRefs.days.innerHTML = days;
@@ -57,6 +62,46 @@ class CountdownTimer {
       timerRefs.secs.innerHTML = secs;
     }
 
+    function timeactive(days, hours, mins, secs) {
+      //add and remove active class (.field_click) to changed field
+      if (days !== oldvalues.days) {
+        timerRefs.days.parentNode.classList.add('field_click');
+        const timerTick = setTimeout(timeOutTick, 150);
+        function timeOutTick() {
+          clearTimeout(timerTick);
+          timerRefs.days.parentNode.classList.remove('field_click');
+        }
+      }
+      if (hours !== oldvalues.hours) {
+        timerRefs.hours.parentNode.classList.add('field_click');
+        const timerTick = setTimeout(timeOutTick, 150);
+        function timeOutTick() {
+          clearTimeout(timerTick);
+          timerRefs.hours.parentNode.classList.remove('field_click');
+        }
+      }
+      if (mins !== oldvalues.mins) {
+        timerRefs.mins.parentNode.classList.add('field_click');
+        const timerTick = setTimeout(timeOutTick, 150);
+        function timeOutTick() {
+          clearTimeout(timerTick);
+          timerRefs.mins.parentNode.classList.remove('field_click');
+        }
+      }
+      if (secs !== oldvalues.secs) {
+        timerRefs.secs.parentNode.classList.add('field_click');
+        const timerTick = setTimeout(timeOutTick, 150);
+        function timeOutTick() {
+          clearTimeout(timerTick);
+          timerRefs.secs.parentNode.classList.remove('field_click');
+        }
+      }
+
+      oldvalues.days = days;
+      oldvalues.hours = hours;
+      oldvalues.mins = mins;
+      oldvalues.secs = secs;
+    }
     start();
   }
 }
