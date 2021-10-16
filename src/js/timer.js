@@ -8,91 +8,93 @@ const refs = {
 
 class CountdownTimer {
   constructor(setTime) {
-    const selector = setTime.selector;
-    const time = setTime.targetDate.getTime();
-    const timerRefs = {
-      days: document.querySelector(`${selector}`).querySelector('[data-value="days"]'),
-      hours: document.querySelector(`${selector}`).querySelector('[data-value="hours"]'),
-      mins: document.querySelector(`${selector}`).querySelector('[data-value="mins"]'),
-      secs: document.querySelector(`${selector}`).querySelector('[data-value="secs"]'),
+    this.selector = setTime.selector;
+    this.time = setTime.targetDate.getTime();
+    this.timerRefs = {
+      days: document.querySelector(`${this.selector}`).querySelector('[data-value="days"]'),
+      hours: document.querySelector(`${this.selector}`).querySelector('[data-value="hours"]'),
+      mins: document.querySelector(`${this.selector}`).querySelector('[data-value="mins"]'),
+      secs: document.querySelector(`${this.selector}`).querySelector('[data-value="secs"]'),
     };
-    let started = false; //started timer
-    let timerId = null;
-    let changeTime = null;
-    const oldvalues = {};
-    function start() {
-      if (!started) {
-        timerId = setInterval(newValue, 1000);
-        started = true;
-        return;
-      }
-    }
+    this.started = false; //started timer
+    this.timerId = null;
+    this.changeTime = null;
+    this.oldvalues = {};
+    this.nowDate = Date.now();
+    this.start();
+  }
 
-    const observer = new MutationObserver(e => console.log(e));
-    function newValue() {
-      if (Date.now() < time) {
-        changeTime = time - Date.now();
-        // console.log(changeTime); //==============change time
-        updateTime(changeTime);
-        return;
-      }
-      clearInterval(timerId);
-      started = false;
-      // console.log('timer-stop', `${time}`);
+  start() {
+    if (!this.started) {
+      this.timerId = setInterval(() => {
+        this.newValue();
+      }, 1000);
+      this.started = true;
       return;
     }
-    function pad(value) {
-      return String(value).padStart(2, '0');
+  }
+  newValue() {
+    if (Date.now() < this.time) {
+      this.changeTime = this.time - Date.now();
+      // console.log(this.changeTime); //==============change time
+      this.updateTime(this.changeTime);
+      return;
     }
-    function updateTime(currentTime) {
-      //formatting UNIX time to dd.. hh mm ss
-      const days = pad(Math.floor(currentTime / (1000 * 60 * 60 * 24)));
-      const hours = pad(Math.floor((currentTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-      const mins = pad(Math.floor((currentTime % (1000 * 60 * 60)) / (1000 * 60)));
-      const secs = pad(Math.floor((currentTime % (1000 * 60)) / 1000));
-      getValue(days, hours, mins, secs);
-      timeactive(days, hours, mins, secs);
+    clearInterval(this.timerId);
+    this.started = false;
+    // console.log('timer-stop', `${this.time}`);
+    return;
+  }
+  pad(value) {
+    return String(value).padStart(2, '0');
+  }
 
-      observer;
+  getValue(days, hours, mins, secs) {
+    this.timerRefs.days.innerHTML = days;
+    this.timerRefs.hours.innerHTML = hours;
+    this.timerRefs.mins.innerHTML = mins;
+    this.timerRefs.secs.innerHTML = secs;
+  }
+
+  timeactive(days, hours, mins, secs) {
+    //checker changes values
+    if (days !== this.oldvalues.days) {
+      this.adaptiveList(this.timerRefs.days);
     }
-    function getValue(days, hours, mins, secs) {
-      timerRefs.days.innerHTML = days;
-      timerRefs.hours.innerHTML = hours;
-      timerRefs.mins.innerHTML = mins;
-      timerRefs.secs.innerHTML = secs;
+    if (hours !== this.oldvalues.hours) {
+      this.adaptiveList(this.timerRefs.hours);
     }
-
-    function timeactive(days, hours, mins, secs) {
-      //checker changes values
-      if (days !== oldvalues.days) {
-        adaptiveList(timerRefs.days);
-      }
-      if (hours !== oldvalues.hours) {
-        adaptiveList(timerRefs.hours);
-      }
-      if (mins !== oldvalues.mins) {
-        adaptiveList(timerRefs.mins);
-      }
-      if (secs !== oldvalues.secs) {
-        adaptiveList(timerRefs.secs);
-      }
-
-      oldvalues.days = days;
-      oldvalues.hours = hours;
-      oldvalues.mins = mins;
-      oldvalues.secs = secs;
+    if (mins !== this.oldvalues.mins) {
+      this.adaptiveList(this.timerRefs.mins);
+    }
+    if (secs !== this.oldvalues.secs) {
+      this.adaptiveList(this.timerRefs.secs);
     }
 
-    function adaptiveList(rel) {
-      //add and remove active class (.field_click)
-      rel.parentNode.classList.add('field_click');
-      const timerTick = setTimeout(timeOutTick, 150);
-      function timeOutTick() {
-        clearTimeout(timerTick);
-        rel.parentNode.classList.remove('field_click');
-      }
+    this.oldvalues.days = days;
+    this.oldvalues.hours = hours;
+    this.oldvalues.mins = mins;
+    this.oldvalues.secs = secs;
+  }
+
+  adaptiveList(rel) {
+    //add and remove active class (.field_click)
+    rel.parentNode.classList.add('field_click');
+    const timerTick = setTimeout(timeOutTick, 150);
+    function timeOutTick() {
+      clearTimeout(timerTick);
+      rel.parentNode.classList.remove('field_click');
     }
-    start();
+  }
+
+  updateTime(currentTime) {
+    //formatting UNIX time to dd.. hh mm ss
+    const days = this.pad(Math.floor(currentTime / (1000 * 60 * 60 * 24)));
+    const hours = this.pad(Math.floor((currentTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+    const mins = this.pad(Math.floor((currentTime % (1000 * 60 * 60)) / (1000 * 60)));
+    const secs = this.pad(Math.floor((currentTime % (1000 * 60)) / 1000));
+    this.getValue(days, hours, mins, secs);
+    this.timeactive(days, hours, mins, secs);
   }
 }
 
